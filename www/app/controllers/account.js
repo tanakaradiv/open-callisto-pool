@@ -4,13 +4,14 @@ export default Ember.Controller.extend({
   applicationController: Ember.inject.controller('application'),
   config: Ember.computed.reads('applicationController.config'),
   stats: Ember.computed.reads('applicationController.model.stats'),
+  hashrate: Ember.computed.reads('applicationController.hashrate'),
   chartOptions: Ember.computed("model.hashrate", {
         get() {
             var e = this,
                 t = e.getWithDefault("model.minerCharts"),
                 a = {
                     chart: {
-                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        backgroundColor: "rgba(0, 0, 0, 0.1)",
                         type: "spline",
                         marginRight: 10,
                         height: 400,
@@ -54,7 +55,11 @@ export default Ember.Controller.extend({
                         color: "#808080"
                     }],
                     legend: {
-                        enabled: true
+                        enabled: true,
+                        itemStyle:
+                          {
+                            color:"#ffffff"
+                          },
                     },
                     tooltip: {
                         formatter: function() {
@@ -134,6 +139,17 @@ export default Ember.Controller.extend({
         return 0;
       }
       return percent;
+    }
+  }),
+  netHashrate: Ember.computed({
+      get() {
+        return this.get('hashrate');
+        }
+        }),
+  earnPerDay: Ember.computed('model', {
+    get() {
+      return 24 * 60 * 60 / this.get('config').BlockTime * this.get('config').BlockReward *
+      this.getWithDefault('model.hashrate') / this.get('hashrate');
     }
   })
 });

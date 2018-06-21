@@ -9,14 +9,18 @@
           <th>ID</th>
           <th>Hashrate (rough, short average)</th>
           <th>Hashrate (accurate, long average)</th>
+          <th>Earnings per day (short avg)</th>
+          <th>Diff</th>
           <th>Last Share</th>
         </tr>
       </thead>
       <tbody>
         {{#each-in model.workers as |k v|}}
-          <tr class="{{if v.offline "warning" "success"}}">
+          <tr class="worker-class {{if v.offline "warning" "success"}} {{worker-colorizer v.lastBeat}}">
             <td>{{k}}</td>
             <td>{{format-hashrate v.hr}}</td>
+            <td>{{format-hashrate v.hr2}}</td>
+            <td>{{format-number (worker-earnperday v.hr netstats.hashrate)}} {{config.Unit}}</td>
             <td>{{format-hashrate v.hr2}}</td>
             <td>{{format-relative (seconds-to-ms v.lastBeat)}}</td>
           </tr>

@@ -21,7 +21,7 @@ export default Ember.Controller.extend({
             t = e.getWithDefault("model.paymentCharts"),
             a = {
                 chart: {
-                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    backgroundColor: "rgba(0, 0, 0, 0.1)",
                     type: "column",
                     marginRight: 10,
                     height: 200,
@@ -60,7 +60,11 @@ export default Ember.Controller.extend({
                     color: "#808080"
                 }],
                 legend: {
-                    enabled: true
+                    enabled: true,
+                    itemStyle:
+                      {
+                        color:"#ccc"
+                      },
                 },
                 tooltip: {
                     formatter: function() {
