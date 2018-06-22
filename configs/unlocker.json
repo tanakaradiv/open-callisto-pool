@@ -85,7 +85,7 @@
   "unlocker": {
     "enabled": true,
     "poolFee": 0.5,
-    "poolFeeAddress": "0x",
+    "poolFeeAddress": "",
     "donate": true,
     "depth": 120,
     "immatureDepth": 20,
@@ -98,7 +98,7 @@
   "payouts": {
     "enabled": false,
     "requirePeers": 5,
-    "interval": "12h",
+    "interval": "3h",
     "daemon": "http://127.0.0.1:8545",
     "timeout": "10s",
     "address": "0x",
@@ -107,6 +107,6 @@
     "gasPrice": "50000000000",
     "threshold": 1000000000,
     "bgsave": false,
-    "concurrentTx": 10
+    "concurrentTx": 5
   }
 }

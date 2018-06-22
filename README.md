@@ -1,9 +1,9 @@
 ## Open Source Callisto (CLO) Mining Pool
 
-![Main page of open-callisto-pool](https://raw.githubusercontent.com/chainkorea/open-callisto-pool/master/misc/open-callisto-pool.PNG)
+![Main page of open-callisto-pool](https://raw.githubusercontent.com/ethpool-update-project/open-callisto-pool/master/misc/pool.PNG)
 
-[![Build Status](https://travis-ci.org/chainkorea/open-callisto-pool.svg?branch=master)](https://travis-ci.org/chainkorea/open-callisto-pool)
-[![Go Report Card](https://goreportcard.com/badge/github.com/chainkorea/open-callisto-pool)](https://goreportcard.com/report/github.com/chainkorea/open-callisto-pool)
+[![Build Status](https://api.travis-ci.org/ethpool-update-project/open-callisto-pool.svg?branch=master)](https://travis-ci.org/ethpool-update-project/open-callisto-pool)
+[![Report Card](https://goreportcard.com/badge/github.com/ethpool-update-project/open-callisto-pool)](https://goreportcard.com/report/github.com/ethpool-update-project/open-callisto-pool)
 
 ### Features  
 
@@ -53,7 +53,7 @@ It is recommended to bind your DB address on 127.0.0.1 or on internal ip. Also, 
 
     $ sudo apt-get install nginx
 
-Search on Google for nginx-setting
+sample config located at configs/nginx.default.example (HINT, edit and move to /etc/nginx/sites-available/default)
 
 ### Install NODE
 

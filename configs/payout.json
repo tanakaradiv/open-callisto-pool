@@ -84,7 +84,7 @@
 
   "unlocker": {
     "enabled": false,
-    "poolFee": 1.0,
+    "poolFee": 0.5,
     "poolFeeAddress": "",
     "donate": true,
     "depth": 120,
@@ -107,6 +107,6 @@
     "gasPrice": "50000000000",
     "threshold": 1000000000,
     "bgsave": true,
-    "concurrentTx": 1
+    "concurrentTx": 5
   }
 }
