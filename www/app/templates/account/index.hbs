@@ -7,21 +7,21 @@
       <thead>
         <tr>
           <th>ID</th>
-          <th>Hashrate (rough, short average)</th>
-          <th>Hashrate (accurate, long average)</th>
-          <th>Earnings per day (short avg)</th>
-          <th>Diff</th>
-          <th>Last Share</th>
+          <th>Hashrate 30m / 3h</th>
+          <th>Earnings / day (short avg)</th>
+          <th>Difficulty</th>
+          <th>Server</th>
+          <th>Last Seen</th>
         </tr>
       </thead>
       <tbody>
         {{#each-in model.workers as |k v|}}
           <tr class="worker-class {{if v.offline "warning" "success"}} {{worker-colorizer v.lastBeat}}">
             <td>{{k}}</td>
-            <td>{{format-hashrate v.hr}}</td>
-            <td>{{format-hashrate v.hr2}}</td>
+            <td>{{format-hashrate v.hr}} / {{format-hashrate v.hr2}}</td>
             <td>{{format-number (worker-earnperday v.hr netstats.hashrate)}} {{config.Unit}}</td>
-            <td>{{format-hashrate v.hr2}}</td>
+            <td>{{format-difficulty v.difficulty}}</td>
+            <td>{{v.hostname}}</td>
             <td>{{format-relative (seconds-to-ms v.lastBeat)}}</td>
           </tr>
         {{/each-in}}

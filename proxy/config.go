@@ -39,6 +39,7 @@ type Proxy struct {
 	Difficulty           int64  `json:"difficulty"`
 	StateUpdateInterval  string `json:"stateUpdateInterval"`
 	HashrateExpiration   string `json:"hashrateExpiration"`
+	StratumHostname      string `json:"stratumHostname"`
 
 	Policy policy.Config `json:"policy"`
 

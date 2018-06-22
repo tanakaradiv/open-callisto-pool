@@ -18,6 +18,12 @@ if [ ! -L "$ethdir/open-callisto-pool" ]; then
     cd "$root"
 fi
 
+cd "$ethdir"
+mv "open-callisto-pool" "open-callisto-pool.old"
+ln -s ../../../../../. open-callisto-pool
+cd "$root"
+
+
 # Set up the environment to use the workspace.
 # Also add Godeps workspace so we build using canned dependencies.
 GOPATH="$workspace"

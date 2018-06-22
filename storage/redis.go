@@ -95,9 +95,12 @@ type Miner struct {
 	startedAt int64
 }
 
+// Addition from Mohannad Otaibi to report Difficulty
 type Worker struct {
 	Miner
 	TotalHR int64 `json:"hr2"`
+	WorkerDiff int64 `json:"difficulty"`
+	WorkerHostname string `json:"hostname"`
 }
 
 func NewRedisClient(cfg *Config, prefix string, pplns int64) *RedisClient {
@@ -311,7 +314,7 @@ func (r *RedisClient) checkPoWExist(height uint64, params []string) (bool, error
 	return val == 0, err
 }
 
-func (r *RedisClient) WriteShare(login, id string, params []string, diff int64, height uint64, window time.Duration) (bool, error) {
+func (r *RedisClient) WriteShare(login, id string, params []string, diff int64, height uint64, window time.Duration, hostname string) (bool, error) {
 	exist, err := r.checkPoWExist(height, params)
 	if err != nil {
 		return false, err
@@ -327,14 +330,14 @@ func (r *RedisClient) WriteShare(login, id string, params []string, diff int64, 
 	ts := ms / 1000
 
 	_, err = tx.Exec(func() error {
-		r.writeShare(tx, ms, ts, login, id, diff, window)
+		r.writeShare(tx, ms, ts, login, id, diff, window, hostname)
 		tx.HIncrBy(r.formatKey("stats"), "roundShares", diff)
 		return nil
 	})
 	return false, err
 }
 
-func (r *RedisClient) WriteBlock(login, id string, params []string, diff, roundDiff int64, height uint64, window time.Duration) (bool, error) {
+func (r *RedisClient) WriteBlock(login, id string, params []string, diff, roundDiff int64, height uint64, window time.Duration, hostname string) (bool, error) {
 	exist, err := r.checkPoWExist(height, params)
 	if err != nil {
 		return false, err
@@ -350,7 +353,7 @@ func (r *RedisClient) WriteBlock(login, id string, params []string, diff, roundD
 	ts := ms / 1000
 
 	cmds, err := tx.Exec(func() error {
-		r.writeShare(tx, ms, ts, login, id, diff, window)
+		r.writeShare(tx, ms, ts, login, id, diff, window, hostname)
 		tx.HSet(r.formatKey("stats"), "lastBlockFound", strconv.FormatInt(ts, 10))
 		tx.HDel(r.formatKey("stats"), "roundShares")
 		tx.ZIncrBy(r.formatKey("finders"), 1, login)
@@ -397,17 +400,29 @@ func (r *RedisClient) WriteBlock(login, id string, params []string, diff, roundD
 	}
 }
 
-func (r *RedisClient) writeShare(tx *redis.Multi, ms, ts int64, login, id string, diff int64, expire time.Duration) {
+// ID is the worker name
+func (r *RedisClient) writeShare(tx *redis.Multi, ms, ts int64, login, id string, diff int64, expire time.Duration, hostname string) {
+	/* # Note To Me:
+				Will have to write to get from redis the current value for round
+				shares and increase by 1, then include the new number to be added to redis
+	*/
+
 	times := int(diff / 1000000000)
+
+	// Moved get hostname to stratums
+
 	for i := 0; i < times; i++ {
 		tx.LPush(r.formatKey("lastshares"), login)
 	}
 	tx.LTrim(r.formatKey("lastshares"), 0, r.pplns)
 
 	tx.HIncrBy(r.formatKey("shares", "roundCurrent"), login, diff)
-	tx.ZAdd(r.formatKey("hashrate"), redis.Z{Score: float64(ts), Member: join(diff, login, id, ms)})
-	tx.ZAdd(r.formatKey("hashrate", login), redis.Z{Score: float64(ts), Member: join(diff, id, ms)})
-	tx.Expire(r.formatKey("hashrate", login), expire) // Will delete hashrates for miners that gone
+	// For aggregation of hashrate, to store value in hashrate key
+	tx.ZAdd(r.formatKey("hashrate"), redis.Z{Score: float64(ts), Member: join(diff, login, id, ms, diff, hostname)})
+	// For separate miner's workers hashrate, to store under hashrate table under login key
+	tx.ZAdd(r.formatKey("hashrate", login), redis.Z{Score: float64(ts), Member: join(diff, id, ms, diff, hostname)})
+	// Will delete hashrates for miners that gone
+	tx.Expire(r.formatKey("hashrate", login), expire)
 	tx.HSet(r.formatKey("miners", login), "lastShare", strconv.FormatInt(ts, 10))
 }
 
@@ -1078,12 +1093,26 @@ func convertWorkersStats(window int64, raw *redis.ZSliceCmd) map[string]Worker {
 	for _, v := range raw.Val() {
 		parts := strings.Split(v.Member.(string), ":")
 		share, _ := strconv.ParseInt(parts[0], 10, 64)
+
+		//By Mohannad
+		var hostname string
+		if len(parts)>3 {
+			hostname = parts[4]
+		}else{
+			hostname = "unknown"
+		}
+
 		id := parts[1]
 		score := int64(v.Score)
 		worker := workers[id]
 
 		// Add for large window
 		worker.TotalHR += share
+
+		// Addition from Mohannad Otaibi to report Difficulty
+		worker.WorkerDiff = share
+		worker.WorkerHostname = hostname
+		// End Mohannad Adjustments
 
 		// Add for small window if matches
 		if score >= now-window {
