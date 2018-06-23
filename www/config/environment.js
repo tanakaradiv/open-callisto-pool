@@ -16,6 +16,8 @@ module.exports = function(environment) {
     APP: {
       // API host and port
       ApiUrl: '//clo.cryptomena.io/',
+      PoolName: 'CLO Pool',
+      CompanyName: 'cryptomena.io',
       // HTTP mining endpoint
       HttpHost: 'https://clo.cryptomena.io',
       HttpPort: 8882,
@@ -26,7 +28,8 @@ module.exports = function(environment) {
 
       // Fee and payout details
       PoolFee: '0.5%',
-      PayoutThreshold: '1.0 CLO',
+      PayoutThreshold: '1.0',
+      PayoutInterval: '3h',
 
       // For network hashrate (change for your favourite fork)
       BlockTime: 14.4,
