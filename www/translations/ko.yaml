@@ -1,0 +1,157 @@
+general:
+  direction: ltr
+menu:
+  home: 홈
+  help: 도움말
+  pool_blocks: 블록 정보
+  calculator: 계산기
+  payments: 지급내역
+  miners: 마이너
+  about: 이곳은
+  i18n:
+    about: 이곳은
+    help: 도움말
+  language: 언어
+
+lang:
+  arabic: عربي
+  english: English
+  korean: 한국어
+
+home:
+  min_payout_threshold: 최소 지급량
+  payouts_run: 매 {interval} 마다.
+  payout_scheme_detail: 실시간 PPLNS 방식 지급.
+  miners_online: 활동 마이너
+  pool_hashrate: 풀 해시량
+  pool_fee: 풀 수수료
+  last_block_found: 마지막 블록 발견
+  network_difficulty: 네트워크 난이도
+  network_hashrate: 네트워크 총해시
+  blockchain_height: 현재 블록 번호
+  current_round_variance: 현재 블록 효율
+  query_history: 마이너 상태 및 지급내역 조회
+  input:
+    enter_your_wallet_address: 조회할 지갑 주소 입력
+  button:
+    lookup: 조회
+  help:
+    minimal: 간단한 도움말
+  settings:
+    difficulty: (난이도 {diff} billion)
+    help: 도움말 보기
+    title: 워커 {hashes} MH/s
+    stratum_mining: Stratum Mining
+    commands:
+      windows: Windows
+      smos: 심플 마이닝
+      windows_instruction: 배치 파일에 추가
+      smos_instruction: 작업 그룹에 추가
+
+account:
+  immature:
+    balance: 적립대기 잔고
+    description: 블록이 확정되기를 기다리는 잔고입니다.
+  pending:
+    balance: 지급대기 잔고
+    description: 지급 대기중인 잔고입니다.
+  current: 지급진행 수량
+  last_share_submitted: 최근 쉐어 제출
+  online: 작동중인 워커
+  hashrate: 해시량
+  earnings:
+    miner: 하루 채굴 예상량 (3시간 평균)
+    worker: 채굴 예상량 (단기 평균)
+  blocks:
+    found: 발견한 블록
+  total:
+    payments: 총 출금회수
+    paid: 지급완료 수량
+  round_share: 라운드 배당율
+  round_share_description: 현재 라운드에 대한 배당 비율.
+  epoch_switch: 에폭 전환
+  workers: 워커
+  payouts: 지급내역
+
+  your_workers: 워커 현황
+  server: 서버
+  difficulty: 난이도
+  last_share: 마지막 배당
+  short_average: 대략적인 단기 평균
+  short_average_abbrv: 30분
+  long_average: 좀더 정확한 평균
+  long_average_abbrv: 3시간
+  no_workers_online: 온라인상태의 워커가 없습니다
+  notice: 주의사항
+  notice_html: 쉐어 입력이 충분할 때까지 평균 해시량은 점차 조정됩니다.<br/>약 30분(단기)와 3시간(장기)의 두 가지 계산 기간이 있습니다.<br/>만약 워커가 단기의 1/2(예: 15분)동안 쉐어를 제출하지 않을 경우, 이상이 있는 워커는 테이블에 표시되어 관리가 쉬워집니다.
+  json_api_url: 워커 상태에 대한 JSON API 링크
+
+payout:
+  latest_payouts: 최근 출금 내역
+  time: 지급시간
+  txid: 전송 ID
+  amount: 수량
+  no_payouts_yet: 지급내역이 아직 없습니다
+
+block:
+  pool_rewards: 이 풀은 TX 수수료 및 엉클 블록에 대한 모든 블록 보상을 하고 있습니다.
+  pool_notice:
+    html: 블록 확정은 <em style="text-decoration:underline">최대</em> <span class="label label-success">{success}</span> 블록이 발견되어야 하며, 보통은 그 이전에 확정됩니다.
+  blocks: 적립 완료
+  immature: 적립 대기
+  new: 신규 발견
+  orphan: 외톨이
+  no_matured_blocks_yet: 적립 완료된 블록이 없습니다
+  reward: 보상
+  height: 블록번호
+  hash: 블록 해시
+  time_found: 발견 시간
+  variance: 작업 비율(쉐어/난이도)
+  matured: 적립된 블록
+  immature_blocks: 적립 대기중인 블록
+  no_immature_blocks_yet: 적립 대기중인 블록이 없습니다
+  no_new_blocks_yet: 신규 발견된 블록이 없습니다
+  recently_found_blocks: 신규 발견된 블록
+
+luck:
+  blocks: 블록수
+  shares_diff: 쉐어/난이도
+  uncle_rate: 엉클 비율
+  orphan_rate: 외톨이 비율
+
+payments:
+  pay_tx: 현재 전송 수수료를 이 풀에서 지급하고 있습니다.
+  total_payments_sent: 전체 출금건수
+  latest_payouts: 최근 출금 내역
+  time: 시간
+  amount: 수량
+  address: 주소
+  txid: 전송 ID
+  no_payouts_yet: 출금이 아직 없습니다
+
+miners:
+  total_hashrate: 전체 해시량
+  total_miners: 전체 마이너
+  login: 로그인
+  hashrate: 해시량
+  last_beat: 최근 입력
+  no_miners: 마이너 없음
+  miners: 마이너 현황
+
+wallet:
+  dapp_html: <a href="https://ethereum.org/">https://ethereum.org/</a>
+  online_html: <a href="https://www.myetherwallet.com/">https://www.myetherwallet.com</a> Online wallet at myetherwallet.com
+
+errors:
+  header: 일시적인 API 연결 끊김
+  message: 보통 일시적인 문제이며, 채굴에는 영향을 미치지 않습니다.
+
+links:
+  blockExplorerLink: 'https://cloexplorer.org/'
+  blockExplorerLink_tx: 'https://cloexplorer.org/tx/'
+  blockExplorerLink_uncle: 'https://cloexplorer.org/uncle'
+  blockExplorerLink_block: 'https://cloexplorer.org/block/'
+  blockExplorerLink_address: 'https://cloexplorer.org/addr/'
+
+footer:
+  copyrights: '&copy; Brough to you by <a href="https://t.me/cryptomena_io" target="_blank"><i class="fa fa-telegram" style="color:#0088cc"></i> Cryptomena.io</a> | <strong>Donations:</strong><a href="https://etherscan.io/address/0x1ee22c7176497065DA26B71bcf2C499e52721ce3" rel="nofollow" target="_blank">0x1ee22c7176497065DA26B71bcf2C499e52721ce3</a>'
