@@ -30,20 +30,33 @@ body > .container {
   margin: 20px 0;
 }
 
+/* doesn't work -------- */
+#coin_calculator iframe form{
+  border:none !important;
+  border-radius: 0px !important;
+  background-color: transparent !important;
+}
 
+/* Menu CSS Stuff */
+
+.navbar-fixed-bottom .navbar-collapse, .navbar-fixed-top .navbar-collapse {
+    max-height: unset;
+}
+
+.navbar-collapse.in{
+  overflow: visible;
+}
 
 
 
 h1 {
     font-size: 36px;
     line-height: 42px;
-    font-weight: 600;
 }
 
 h2 {
     font-size: 24px;
     line-height: 32px;
-    font-weight: 300;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -51,6 +64,10 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0px 0px 15px 0px;
     font-weight: 400;
     font-family: 'Poppins', sans-serif;
+}
+
+.modal-title{
+  color:#333;
 }
 
 .space-medium {

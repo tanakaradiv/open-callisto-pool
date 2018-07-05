@@ -13,6 +13,8 @@ import (
 var hasher = ethash.New()
 
 func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, params []string) (bool, bool) {
+	// Now, the function received some work with login id and worker name and all information, ready to be processed
+	// and checked if it is a valid work or not, and if it is a block or not and write to db accordingly
 	nonceHex := params[0]
 	hashNoNonce := params[1]
 	mixDigest := params[2]
@@ -23,6 +25,9 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 	h, ok := t.headers[hashNoNonce]
 	if !ok {
 		log.Printf("Stale share from %v@%v", login, ip)
+		// Here we have a stale share, we need to create a redis function as follows
+		// CASE1: stale Share
+		// s.backend.WriteWorkerShareStatus(login, id, valid bool, stale bool, invalid bool)
 		return false, false
 	}
 
@@ -43,6 +48,9 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 	}
 
 	if !hasher.Verify(share) {
+		// THis is an invalid block, record it
+		// CASE2: invalid Share
+		// s.backend.WriteWorkerShareStatus(login, id, valid bool, stale bool, invalid bool)
 		return false, false
 	}
 
@@ -64,6 +72,7 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 			} else {
 				log.Printf("Inserted block %v to backend", h.height)
 			}
+			// Here we have a valid share, which is in-fact a block and it is written to db
 			log.Printf("Block found by miner %v@%v at height %d", login, ip, h.height)
 		}
 	} else {
@@ -74,6 +83,12 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 		if err != nil {
 			log.Println("Failed to insert share data into backend:", err)
 		}
+
+		// Here we have a valid share, which is only a share and it is written to db
 	}
+	// This means success, either a valid share or a valid block, in this case, record a valid share for the worker
+	// CASE3: Valid Share
+	//	s.backend.WriteWorkerShareStatus(login, id, valid bool, stale bool, invalid bool)
+
 	return false, true
 }

@@ -1,6 +1,8 @@
 general:
   direction: rtl
-
+calculator:
+  title: كم ممكن تربح?
+  close: سكر الباب وراك
 menu:
   home: الرئيسية
   help: مساعدة

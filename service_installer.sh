@@ -1,6 +1,7 @@
 #!/bin/bash
 #will make the services for the pool, based on the pool exe location of /usr/local/bin/poolbin
 user="clopool"
+coin="clo"
 config_dir="/home/$user/open-callisto-pool/configs"
 poolbinary="/home/$user/open-callisto-pool/build/bin/open-callisto-pool"
 
@@ -12,7 +13,7 @@ fi
 
 echo "
 [Unit]
-Description=pool-api
+Description=$coin-api
 
 [Service]
 Type=simple
@@ -20,11 +21,11 @@ ExecStart=$poolbinary $config_dir/api.json
 
 [Install]
 WantedBy=multi-user.target
-">/etc/systemd/system/pool-api.service
+">/etc/systemd/system/$coin-api.service
 
 echo "
 [Unit]
-Description=pool-stratum2b
+Description=$coin-stratum2b
 
 [Service]
 Type=simple
@@ -32,12 +33,12 @@ ExecStart=$poolbinary $config_dir/stratum2b.json
 
 [Install]
 WantedBy=multi-user.target
-">/etc/systemd/system/pool-stratum2b.service
+">/etc/systemd/system/$coin-stratum2b.service
 
 
 echo "
 [Unit]
-Description=pool-stratum4b
+Description=$coin-stratum4b
 
 [Service]
 Type=simple
@@ -45,12 +46,12 @@ ExecStart=$poolbinary $config_dir/stratum4b.json
 
 [Install]
 WantedBy=multi-user.target
-">/etc/systemd/system/pool-stratum4b.service
+">/etc/systemd/system/$coin-stratum4b.service
 
 
 echo "
 [Unit]
-Description=pool-stratum9b
+Description=$coin-stratum9b
 
 
 [Service]
@@ -59,12 +60,12 @@ ExecStart=$poolbinary $config_dir/stratum9b.json
 
 [Install]
 WantedBy=multi-user.target
-">/etc/systemd/system/pool-stratum9b.service
+">/etc/systemd/system/$coin-stratum9b.service
 
 
 echo "
 [Unit]
-Description=pool-unlocker
+Description=$coin-unlocker
 
 
 [Service]
@@ -73,11 +74,11 @@ ExecStart=$poolbinary $config_dir/unlocker.json
 
 [Install]
 WantedBy=multi-user.target
-">/etc/systemd/system/pool-unlocker.service
+">/etc/systemd/system/$coin-unlocker.service
 
 echo "
 [Unit]
-Description=pool-payout
+Description=$coin-payout
 
 [Service]
 Type=simple
@@ -85,23 +86,23 @@ ExecStart=$poolbinary $config_dir/payout.json
 
 [Install]
 WantedBy=multi-user.target
-">/etc/systemd/system/pool-payout.service
+">/etc/systemd/system/$coin-payout.service
 
 systemctl daemon-reload
 
-systemctl enable pool-api
-systemctl enable pool-stratum2b
-systemctl enable pool-stratum4b
-systemctl enable pool-stratum9b
-systemctl enable pool-unlocker
-systemctl enable pool-payout
+systemctl enable $coin-api
+systemctl enable $coin-stratum2b
+systemctl enable $coin-stratum4b
+systemctl enable $coin-stratum9b
+#systemctl enable $coin-unlocker
+#systemctl enable $coin-payout
 
-systemctl start pool-api
-systemctl start pool-stratum2b
-systemctl start pool-stratum4b
-systemctl start pool-stratum9b
-systemctl start pool-unlocker
-systemctl start pool-payout
+systemctl start $coin-api
+systemctl start $coin-stratum2b
+systemctl start $coin-stratum4b
+systemctl start $coin-stratum9b
+#systemctl start $coin-unlocker
+#systemctl start $coin-payout
 
 
 

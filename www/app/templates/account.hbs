@@ -18,6 +18,7 @@
         </div>
         {{/if}}
         <div style="display: block;"><i class="fa fa-btc"></i> {{t "account.total.paid"}}: <span>{{format-balance model.stats.paid}} {{config.Unit}}</span></div>
+        <div style="display: block;"><i class="fa fa-money"></i> Last 24h Reward: <span>{{format-balance model.24hreward}}</span></div>
 </div>
 
       </div>
@@ -63,6 +64,10 @@
     {{#active-li currentWhen='account.index' role='presentation'}}
       {{#link-to 'account.index'}}{{t "account.workers"}} <span class="badge alert-danger">{{model.workersOffline}}</span>{{/link-to}}
     {{/active-li}}
+    {{#active-li currentWhen='account.rewards' role='presentation'}}
+      {{#link-to 'account.rewards'}}Rewards{{/link-to}}
+    {{/active-li}}
+
     {{#active-li currentWhen='account.payouts' role='presentation'}}
       {{#link-to 'account.payouts'}}{{t "account.payouts"}}{{/link-to}}
     {{/active-li}}

@@ -245,6 +245,9 @@ func (s *ApiServer) StatsIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *ApiServer) MinersIndex(w http.ResponseWriter, r *http.Request) {
+
+	// TODO: Want to get the most used server from workers, so it can be deisplayed in miners page
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Cache-Control", "no-cache")

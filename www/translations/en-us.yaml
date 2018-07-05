@@ -1,5 +1,8 @@
 general:
   direction: ltr
+calculator:
+  title: How much are you gonna earn?
+  close: Close the door behind
 menu:
   home: Home
   help: Help
