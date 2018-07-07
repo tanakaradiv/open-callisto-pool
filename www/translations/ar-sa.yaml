@@ -19,6 +19,7 @@ menu:
 lang:
   arabic: عربي
   english: English
+  korean: Korean
 
 home:
   min_payout_threshold: الحد الأدنى للدفع

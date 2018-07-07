@@ -46,7 +46,8 @@ export default Ember.Route.extend({
      let intl = this.get('intl');
      this.set('languages', [
       { name: intl.t('lang.arabic'), value: 'ar-sa'},
-      { name: intl.t('lang.english'), value: 'en-us'}
+      { name: intl.t('lang.english'), value: 'en-us'},
+      { name: intl.t('lang.korean'), value: 'ko'}
     ]);
    },
 
