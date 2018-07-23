@@ -12,6 +12,7 @@
           <th>{{t "account.difficulty"}}</th>
           <th>{{t "account.server"}}</th>
           <th>{{t "account.last_share"}}</th>
+          <th>Valid / Stale / Invalid</th>
         </tr>
       </thead>
       <tbody>
@@ -23,6 +24,7 @@
             <td>{{format-difficulty v.difficulty}}</td>
             <td>{{v.hostname}}</td>
             <td>{{format-relative (seconds-to-ms v.lastBeat)}}</td>
+            <th><span class="label label-success">{{v.valid_shares}}</span> / <span class="label label-warning">0</span> / <span class="label label-danger">0</span> </th>
           </tr>
         {{/each-in}}
       </tbody>

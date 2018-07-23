@@ -28,6 +28,7 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 		// Here we have a stale share, we need to create a redis function as follows
 		// CASE1: stale Share
 		// s.backend.WriteWorkerShareStatus(login, id, valid bool, stale bool, invalid bool)
+		s.backend.WriteWorkerShareStatus(login, id, false, true, false)
 		return false, false
 	}
 
@@ -50,7 +51,7 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 	if !hasher.Verify(share) {
 		// THis is an invalid block, record it
 		// CASE2: invalid Share
-		// s.backend.WriteWorkerShareStatus(login, id, valid bool, stale bool, invalid bool)
+		s.backend.WriteWorkerShareStatus(login, id, false, false, true)
 		return false, false
 	}
 
@@ -89,6 +90,7 @@ func (s *ProxyServer) processShare(login, id, ip string, t *BlockTemplate, param
 	// This means success, either a valid share or a valid block, in this case, record a valid share for the worker
 	// CASE3: Valid Share
 	//	s.backend.WriteWorkerShareStatus(login, id, valid bool, stale bool, invalid bool)
+	s.backend.WriteWorkerShareStatus(login, id, true, false, false)
 
 	return false, true
 }
