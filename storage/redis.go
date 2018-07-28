@@ -436,7 +436,7 @@ func (r *RedisClient) ResetWorkerShareStatus(){
 	defer tx.Close()
 
 	tx.Exec(func() error {
-		tx.HDel(r.formatKey("sharestatus"))
+		tx.Del(r.formatKey("sharestatus"))
 		return nil
 	})
 
