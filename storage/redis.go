@@ -121,9 +121,6 @@ type Worker struct {
 	TotalHR int64 `json:"hr2"`
 	WorkerDiff int64 `json:"difficulty"`
 	WorkerHostname string `json:"hostname"`
-	ValidShares int64 `json:"valid_shares"`
-	StaleShares int64 `json:"stale_shares"`
-	InvalidShares int64 `json:"invalid_shares"`
 }
 
 func NewRedisClient(cfg *Config, prefix string, pplns int64) *RedisClient {
@@ -354,7 +351,6 @@ func (r *RedisClient) WriteShare(login, id string, params []string, diff int64, 
 
 	_, err = tx.Exec(func() error {
 		r.writeShare(tx, ms, ts, login, id, diff, window, hostname)
-		//It's using the other writeShare method, and recording stat if everything is fine
 		tx.HIncrBy(r.formatKey("stats"), "roundShares", diff)
 		return nil
 	})
@@ -377,8 +373,6 @@ func (r *RedisClient) WriteBlock(login, id string, params []string, diff, roundD
 	ts := ms / 1000
 
 	cmds, err := tx.Exec(func() error {
-		// Ok, here we have a block. We should reset round stats,
-		// Here it's writing the last share using this method (writeSHare)
 		r.writeShare(tx, ms, ts, login, id, diff, window, hostname)
 		tx.HSet(r.formatKey("stats"), "lastBlockFound", strconv.FormatInt(ts, 10))
 		tx.HDel(r.formatKey("stats"), "roundShares")
@@ -386,9 +380,6 @@ func (r *RedisClient) WriteBlock(login, id string, params []string, diff, roundD
 		tx.HIncrBy(r.formatKey("miners", login), "blocksFound", 1)
 		tx.HGetAllMap(r.formatKey("shares", "roundCurrent"))
 		tx.Del(r.formatKey("shares", "roundCurrent"))
-		// For Mohannad's new shares validity checker (reset)
-		tx.HDel(r.formatKey("sharestatus"))
-
 		tx.LRange(r.formatKey("lastshares"), 0, r.pplns)
 		return nil
 	})
@@ -430,97 +421,17 @@ func (r *RedisClient) WriteBlock(login, id string, params []string, diff, roundD
 	}
 }
 
-// Need a function to delete on round end or whatever, and another function to get.
-func (r *RedisClient) ResetWorkerShareStatus(){
-	tx := r.client.Multi()
-	defer tx.Close()
-
-	tx.Exec(func() error {
-		tx.HDel(r.formatKey("sharestatus"))
-		return nil
-	})
-
-	// THis should do it ay ?
-	// fuck it
-}
-
-
-// Don't know if this will work, returning three values, but let's see
-
-func (r *RedisClient) getSharesStatus(login string, id string) (int64, int64, int64, error) {
-	valid_shares := r.client.HGet(r.formatKey("sharestatus", login, id), "valid")
-	stale_shares := r.client.HGet(r.formatKey("sharestatus", login, id), "stale")
-	invalid_shares := r.client.HGet(r.formatKey("sharestatus", login, id), "invalid")
-
-	if valid_shares.Err() == redis.Nil || stale_shares.Err() == redis.Nil || invalid_shares.Err() == redis.Nil{
-		return 0, 0, 0, nil
-	} else if valid_shares.Err() != nil || stale_shares.Err() != nil || invalid_shares.Err() != nil {
-		return 0, 0, 0, valid_shares.Err()
-	}
-
-	v_c, _ := valid_shares.Int64()
-	s_c, _ := stale_shares.Int64()
-	i_c, _ := invalid_shares.Int64()
-	return v_c,s_c, i_c, nil
-
-}
-
-//lets try to fuck without understanding and see if it works
-func (r *RedisClient) WriteWorkerShareStatus(login string, id string, valid bool, stale bool, invalid bool){
-	// I don't want the function to return anything, i just hope it works hahahha
-	// Yeah, I need something like this:
-	// don't know if formatkey accepts three things, lets google
-	// ok looks like documentation is shit, let's just hope it works
-	// so, it was a local function, not a global one, hmmmm, so it takes all bullshit fed to it and joins it with :
-	// doh, we need to get the values first, so we can increment by 1
-	// hmmmmm, how do we do that, we need to know how we're gonna store first, so lets continue
-	// so, eventually, we might not need zAdd, we need just to replace the old values
-	// Ok, lesson learned, there is no conversion from boolean to integer, we have to do that manually
-
-	valid_int := 0
-	stale_int := 0
-	invalid_int := 0
-	if valid {
-   valid_int = 1
-	}
-	if stale {
-   stale_int = 1
-	}
-	if invalid {
-   invalid_int = 1
-	}
-
-	// So, we need to initiate the tx object
-	tx := r.client.Multi()
-	defer tx.Close()
-
-	tx.Exec(func() error {
-		// OK, good, no need to read reset and add if i use Hset and HGet shit
-		tx.HIncrBy(r.formatKey("sharestatus", login, id), "valid", int64(valid_int))
-		tx.HIncrBy(r.formatKey("sharestatus", login, id), "stale", int64(stale_int))
-		tx.HIncrBy(r.formatKey("sharestatus", login, id), "invalid", int64(invalid_int)) // Would that work?
-
-		return nil
-	})
-}
-
 // ID is the worker name
 func (r *RedisClient) writeShare(tx *redis.Multi, ms, ts int64, login, id string, diff int64, expire time.Duration, hostname string) {
-	/* # Note To Me: (yeah right, good luck)
+	/* # Note To Me:
 				Will have to write to get from redis the current value for round
 				shares and increase by 1, then include the new number to be added to redis
-				^^^^^^
-				This is the kind of documentation that u should avoid, I don't know what the fuck that means now
 	*/
 
 	times := int(diff / 1000000000)
 
-	// Moved get hostname to stratums ( aha )
-	// So this function basically:
-	// 	- Writes share to db
-	//  - updates last shares
-	//  - updates hashrate, don't know how,
-	//  - sets miners lastshare, aha ok
+	// Moved get hostname to stratums
+
 	for i := 0; i < times; i++ {
 		tx.LPush(r.formatKey("lastshares"), login)
 	}
@@ -1095,7 +1006,7 @@ func (r *RedisClient) CollectWorkersStats(sWindow, lWindow time.Duration, login 
 	currentHashrate := int64(0)
 	online := int64(0)
 	offline := int64(0)
-	workers := convertWorkersStats(smallWindow, cmds[1].(*redis.ZSliceCmd), login, r)
+	workers := convertWorkersStats(smallWindow, cmds[1].(*redis.ZSliceCmd))
 
 	for id, worker := range workers {
 		timeOnline := now - worker.startedAt
@@ -1124,17 +1035,6 @@ func (r *RedisClient) CollectWorkersStats(sWindow, lWindow time.Duration, login 
 
 		currentHashrate += worker.HR
 		totalHashrate += worker.TotalHR
-		//worker.valid_shares = worker.valid_shares
-		valid_share, stale_share, invalid_share, _ := r.getSharesStatus(login,id)
-		worker.ValidShares = int64(5)
-		worker.StaleShares = int64(5)
-		worker.InvalidShares = int64(5)
-		worker.ValidShares = valid_share
-		worker.StaleShares = stale_share
-		worker.InvalidShares = invalid_share
-
-
-
 		workers[id] = worker
 	}
 
@@ -1145,10 +1045,10 @@ func (r *RedisClient) CollectWorkersStats(sWindow, lWindow time.Duration, login 
 	stats["hashrate"] = totalHashrate
 	stats["currentHashrate"] = currentHashrate
 
-
-	// Rewards Shit
 	stats["rewards"] = convertRewardResults(cmds[2].(*redis.ZSliceCmd)) // last 40
 	rewards := convertRewardResults(cmds[3].(*redis.ZSliceCmd)) // all
+
+
 
 	var dorew []*SumRewardData
 	dorew = append(dorew, &SumRewardData{ Name: "Last 60 minutes", Interval: 3600, Offset: 0 })
@@ -1266,6 +1166,9 @@ func convertRewardResults(rows ...*redis.ZSliceCmd) []*RewardData {
 }
 
 
+
+
+
 func convertBlockResults(rows ...*redis.ZSliceCmd) []*BlockData {
 	var result []*BlockData
 	for _, row := range rows {
@@ -1294,7 +1197,7 @@ func convertBlockResults(rows ...*redis.ZSliceCmd) []*BlockData {
 
 // Build per login workers's total shares map {'rig-1': 12345, 'rig-2': 6789, ...}
 // TS => diff, id, ms
-func convertWorkersStats(window int64, raw *redis.ZSliceCmd, login string, r *RedisClient) map[string]Worker {
+func convertWorkersStats(window int64, raw *redis.ZSliceCmd) map[string]Worker {
 	now := util.MakeTimestamp() / 1000
 	workers := make(map[string]Worker)
 
@@ -1320,10 +1223,6 @@ func convertWorkersStats(window int64, raw *redis.ZSliceCmd, login string, r *Re
 		// Addition from Mohannad Otaibi to report Difficulty
 		worker.WorkerDiff = share
 		worker.WorkerHostname = hostname
-		// shares shit
-		//worker.valid_shares, _ = r.getValidShares(login,id)
-		worker.ValidShares = int64(4)
-
 		// End Mohannad Adjustments
 
 		// Add for small window if matches
