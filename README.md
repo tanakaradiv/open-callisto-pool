@@ -18,6 +18,7 @@
 * PPLNS block reward
 * Multi-tx payout at once
 * Beautiful front-end highcharts embedded
+* Patched for eth london fork support
 
 #### Proxies
 
@@ -26,103 +27,68 @@
 
 ## Guide to make your very own Callisto mining pool
 
-### Building on Linux
+### Building on Linux using Ubuntu 20 lts
 
 Dependencies:
 
-  * go >= 1.10
-  * redis-server >= 2.8.0
+  * go >= 1.13
+  * redis-server >= 5.0.7
   * nodejs >= 4 LTS
-  * nginx
-  * geth (multi-geth)
+  * nginx (nearly any version supporting reverse proxy)
+  * geth 
 
-**I highly recommend to use Ubuntu 16.04 LTS.**
+**I highly recommend to use Ubuntu 20 LTS.**
 
-### Install go lang
+### Install go lang unzip and some compilers
 
-    $ sudo apt-get install -y build-essential golang-1.10-go unzip
-    $ sudo ln -s /usr/lib/go-1.10/bin/go /usr/local/bin/go
+    $ apt-get install -y build-essential golang-go unzip gcc g++ make
 
 ### Install redis-server
 
-    $ sudo apt-get install redis-server
+    $ apt-get install redis-server
 
 It is recommended to bind your DB address on 127.0.0.1 or on internal ip. Also, please set up the password for advanced security!!!
 
 ### Install nginx
 
-    $ sudo apt-get install nginx
+    $ apt-get install nginx
 
 sample config located at configs/nginx.default.example (HINT, edit and move to /etc/nginx/sites-available/default)
 
-### Install NODE
+### Install NODE and yarn
 
-This will install the latest nodejs
+This will install the latest nodejs and yarn
+    $ curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/yarnkey.gpg >/dev/nullapt-get
+    $ echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+    $ curl -fsSL https://deb.nodesource.com/setup_current.x | sudo -E bash -
+    $ apt-get update
+    $ apt-get install -y nodejs yarn
 
-    $ curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-    $ sudo apt-get install -y nodejs
-
-### Install multi-geth
-
-    $ wget https://github.com/ethereumsocial/multi-geth/releases/download/v1.8.10/multi-geth-linux-v1.8.10.zip
-    $ unzip multi-geth-linux-v1.8.10.zip
-    $ sudo mv geth /usr/local/bin/geth
-
-### Run multi-geth
-
-If you use Ubuntu, it is easier to control services by using serviced.
-
-    $ sudo nano /etc/systemd/system/callisto.service
-
-Copy the following example
-
-```
-[Unit]
-Description=Callisto for Pool
-After=network-online.target
-
-[Service]
-ExecStart=/usr/local/bin/geth --callisto --cache=1024 --rpc --extradata "Mined by <your-pool-domain>" --ethstats "<your-pool-domain>:Callisto@clostats.net"
-User=<your-user-name>
-
-[Install]
-WantedBy=multi-user.target
-```
-
-Then run multi-geth by the following commands
-
-    $ sudo systemctl enable callisto
-    $ sudo systemctl start callisto
-
-If you want to debug the node command
-
-    $ sudo systemctl status callisto
-
-Run console
-
-    $ geth attach
-
-Register pool account and open wallet for transaction. This process is always required, when the wallet node is restarted.
-
-    > personal.newAccount()
-    > personal.unlockAccount(eth.accounts[0],"password",40000000)
+### Run geth (download from your coins repository)
 
 ### Install Callisto Pool
 
-    $ git clone https://github.com/chainkorea/open-callisto-pool
+    $ git clone https://github.com/ethpool-update-project/open-callisto-pool
     $ cd open-callisto-pool
     $ make all
 
-If you face open-callisto-pool after ls ~/open-callisto-pool/build/bin/, the installation has completed.
+If you see open-callisto-pool after ls build/bin/, the installation has completed.
 
-    $ ls ~/open-callisto-pool/build/bin/
+    $ ls build/bin/
 
 ### Set up Callisto pool
 
-    $ mv config.example.json config.json
-    $ nano config.json
+    $ cd configs/
+	go over all the configuration files, example is below. though they are mostly the same, each will be used as its own, for the stanza section that is used for the purpose. 
+for example, the payout module will be executed as (open-callisto-pool-binary path-to-payouts.json). even though the payouts json also has all the stanza for the other sections, only the 
+```json
+ // Pay out miners using this module
+  "payouts": {
+    "enabled": true,
+```
+section will be read by the program.
 
-Set up based on commands below.
+
 
 ```javascript
 {
@@ -328,41 +294,51 @@ I recommend this deployment strategy:
 * API instance - 1x
 
 
-### Run Pool
-It is required to run pool by serviced. If it is not, the terminal could be stopped, and pool doesn’t work.
+### Install pool services
 
-    $ sudo nano /etc/systemd/system/etherpool.service
+It is required to run pool by systemd. If it is not, the terminal could be stopped, and pool doesn’t work.
+We have made an installer script file that will install the needed service files for you
+It will make the username callisto and install service files for 
+* api server
+* stratums of 2,4 and 9 billion difficulty
+* unlocker service
+* payout service
 
-Copy the following example
+   $ ./service_installer.sh  (as root)
 
-```
-[Unit]
-Description=Etherpool
-After=callisto.target
 
-[Service]
-Type=simple
-ExecStart=/home/<your-user-name>/open-callisto-pool/build/bin/open-callisto-pool /home/<your-user-name>/open-callisto-pool/config.json
+## enable services you need, this makes them start after a server reboot
 
-[Install]
-WantedBy=multi-user.target
-```
+    $ systemctl enable clo-api
+    $ systemctl enable clo-stratum2b
+    $ systemctl enable clo-stratum4b
+    $ systemctl enable clo-stratum9b
+    $ #systemctl enable clo-unlocker (you may want to run this manually first, up to you)
+    $ #systemctl enable clo-payout (you may want to run this manually first, up to you)
 
-Then run pool by the following commands
 
-    $ sudo systemctl enable etherpool
-    $ sudo systemctl start etherpool
+## Start Needed services to run pool
+    $ systemctl start nginx (sample configuration file is provided in configs)
 
-If you want to debug the node command
+    $ systemctl start clo-api  (the website gets all its data from this)
+    $ systemctl start clo-stratum2b (this is for low difficulty miners, or low hash miners)
+    $ systemctl start clo-stratum4b (medium hash rate miners)
+    $ systemctl start clo-stratum9b (nice hash or high hash rate miners)
+    $ #systemctl start clo-unlocker (this unlocks found blocks, and assigns credit to miners) 
+    $ #systemctl start clo-payout   (this takes the credit on miners accounts, and pays them on the chain)
 
-    $ sudo systemctl status etherpool
 
-Backend operation has completed so far.
 
 ### Open Firewall
 
 Firewall should be opened to operate this service. Whether Ubuntu firewall is basically opened or not, the firewall should be opened based on your situation.
 You can open firewall by opening 80,443,8080,8888,8008.
+ubuntu uses ufw by default
+    $ ufw allow 80,443,8080,8888,8008/tcp
+    $ ufw allow 22/tcp  #for ssh, not always needed but dont lock yourself out
+    $ ufw enable
+    $ ufw reload
+    $ ufw status
 
 ## Install Frontend
 

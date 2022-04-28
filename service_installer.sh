@@ -1,9 +1,22 @@
 #!/bin/bash
 #will make the services for the pool, based on the pool exe location of /usr/local/bin/poolbin
-user="clopool"
+if [ "${EUID:-$(id -u)}" -ne 0 ]
+then
+        echo "Please run as root"
+        exit
+fi
+
+user="callisto"
 coin="clo"
-config_dir="/home/$user/open-callisto-pool/configs"
-poolbinary="/home/$user/open-callisto-pool/build/bin/open-callisto-pool"
+config_dir="$PWD/configs"
+poolbinary="$PWD/build/bin/open-callisto-pool"
+
+#add the intended user directory
+getent passwd $user > /dev/null
+if [ $? -ne 0 ]; then
+printf "\n################################\nAdding user: $user\n################################\n\n"
+useradd $user -s /bin/bash -m
+fi
 
 if [ ! -e $config_dir ] || [ ! -e $poolbinary ]
 then

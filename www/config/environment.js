@@ -15,15 +15,15 @@ module.exports = function(environment) {
 
     APP: {
       // API host and port
-      ApiUrl: '//clo.cryptomena.io/',
+      ApiUrl: '//clo.yourdomain.net/',
       PoolName: 'CLO Pool',
-      CompanyName: 'cryptomena.io',
+      CompanyName: 'yourdomain.net',
       // HTTP mining endpoint
-      HttpHost: 'https://clo.cryptomena.io',
+      HttpHost: 'https://clo.yourdomain.net',
       HttpPort: 8882,
 
       // Stratum mining endpoint
-      StratumHost: 'clo.cryptomena.io',
+      StratumHost: 'mystratumname.yourdomain.net:',
       StratumPort: 8002,
 
       // Fee and payout details

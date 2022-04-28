@@ -1,6 +1,8 @@
 .DS_Store
 config.json
 testnet.json
-
+open-callisto-pool
+www/package-lock.json
+package-lock.json
 /build/_workspace/
 /build/bin/

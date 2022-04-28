@@ -2,8 +2,9 @@ general:
   direction: ltr
 calculator:
   title: How much are you gonna earn?
-  close: Close the door behind
+  close: Close this window
 menu:
+  motd: Welcome to the pool!
   home: Home
   help: Help
   pool_blocks: Blocks
@@ -156,4 +157,4 @@ links:
   blockExplorerLink_address: 'https://cloexplorer.org/addr/'
 
 footer:
-  copyrights: '&copy; Brough to you by <a href="https://t.me/cryptomena_io" target="_blank"><i class="fa fa-telegram" style="color:#0088cc"></i> Cryptomena.io</a> | <strong>Donations:</strong><a href="https://etherscan.io/address/0x1ee22c7176497065DA26B71bcf2C499e52721ce3" rel="nofollow" target="_blank">0x1ee22c7176497065DA26B71bcf2C499e52721ce3</a>'
+  copyrights: '&copy;'
