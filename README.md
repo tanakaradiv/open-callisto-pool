@@ -356,17 +356,18 @@ Make some modifications in these settings.
 
 The frontend is a single-page Ember.js application that polls the pool API to render miner stats.
 
-    $ cd ~/open-callisto-pool/www
+    $ cd www
     $ sudo npm install -g ember-cli@2.9.1
     $ sudo npm install -g bower
     $ sudo chown -R $USER:$GROUP ~/.npm
     $ sudo chown -R $USER:$GROUP ~/.config
     $ npm install
     $ bower install
-    $ ./build.sh
-    $ cp -R ~/open-callisto-pool/www/dist ~/www
+    $ ./build.sh (edit for it to auto sync the dist directory to your webroot if you like, then builds are just one step)
+    $ cp -R dist yourwebroot/ (probably /var/www/html/)
 
-As you can see above, the frontend of the pool homepage is created. Then, move to the directory, www, which services the file.
+The commands above will produce a dist folder, this folders contents need to be served by a webserver or website. 
+
 
 Set up nginx.
 
