@@ -14,7 +14,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 
-	"github.com/chainkorea/open-callisto-pool/util"
+	"github.com/tanakaradiv/open-callisto-pool/util"
 )
 
 type RPCClient struct {
